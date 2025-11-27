@@ -37,9 +37,11 @@ class ProductImageController extends Controller
         // Large Image
         $destPath = public_path().'/uploads/products/large/'.$imageName;
         $image = Image::read($sourcePath);
-        $image->resize(1400, null, function ($c) {
+        $image->resize(1080, 1350, function ($c) {
             $c->aspectRatio();
+            $c->upsize();
         });
+        // $image->resizeCanvas(1080, 1350, 'center', false, 'ffffff');
         $image->save($destPath);
         
         // Small Image

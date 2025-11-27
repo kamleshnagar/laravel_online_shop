@@ -99,24 +99,32 @@
                     @if (getCategories()->isNotEmpty())
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                             @foreach (getCategories() as $category)
-                                <li class="nav-item dropdown">
-                                    <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown"
-                                        aria-expanded="false">
-                                        {{ $category->name }}
-                                    </button>
-                                    @if ($category->sub_categories->isNotEmpty())
+                                @if ($category->sub_categories->isNotEmpty())
+                                    <li class="nav-item dropdown">
+                                        <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                            {{ $category->name }}
+                                        </button>
+                                    @else
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ route('front.shop', $category->slug) }}"
+                                            title="{{ $category->name }}">{{ $category->name }}</a>
+                                    </li>
+                                @endif
+
+                                @if ($category->sub_categories->isNotEmpty())
+                                    <ul class="dropdown-menu dropdown-menu-dark">
                                         @foreach ($category->sub_categories as $sub_category)
-                                            <ul class="dropdown-menu dropdown-menu-dark">
-                                                <li><a class="dropdown-item nav-link"
-                                                        href="#">{{ $sub_category->name }}</a></li>
-                                            </ul>
+                                            <li><a class="dropdown-item nav-link"
+                                                    href="{{ route('front.shop', [$category->slug,$sub_category->slug]) }}">{{ $sub_category->name }}</a></li>
                                         @endforeach
-                                    @endif
-                                </li>
-                            @endforeach)
+                                @endif
                         </ul>
+                        {{-- </li> --}}
+                    @endforeach)
+                    </ul>
                     @endif
-					
+
                 </div>
                 <div class="right-nav py-0">
                     <a href="cart.php" class="ml-3 d-flex pt-2">

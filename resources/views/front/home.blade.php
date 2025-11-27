@@ -21,7 +21,8 @@
                                 <h1 class="display-4 text-white mb-3">Kids Fashion</h1>
                                 <p class="mx-md-5 px-5">Lorem rebum magna amet lorem magna erat diam stet. Sadips duo stet
                                     amet amet ndiam elitr ipsum diam</p>
-                                <a class="btn btn-outline-light py-2 px-4 mt-3" href="{{ route('front.shop') }}">Shop Now</a>
+                                <a class="btn btn-outline-light py-2 px-4 mt-3" href="{{ route('front.shop') }}">Shop
+                                    Now</a>
                             </div>
                         </div>
                     </div>
@@ -114,22 +115,25 @@
                     @if (getCategories()->isNotEmpty())
                         @foreach (getCategories() as $category)
                             <div class="col-lg-3">
-                                <div class="cat-card">
-                                    <div class="left">
-                                        @if ($category->image != '')
-                                            <img src="{{ asset('uploads/category/thumb/' . $category->image) }}"
-                                                alt="" class="img-fluid">
-                                        @else
-                                            <img class="p-2" src="{{ asset('uploads/default.png') }}" alt="" class="img-fluid">
-                                        @endif
-                                    </div>
-                                    <div class="right">
-                                        <div class="cat-data">
-                                            <h2>{{ $category->name }}</h2>
-                                            {{-- <p>100 Products</p> --}}
+                                <a class="text-dark nav-link" href="{{ route('front.shop', $category->id) }}">
+                                    <div class="cat-card">
+                                        <div class="left">
+                                            @if ($category->image != '')
+                                                <img src="{{ asset('uploads/category/thumb/' . $category->image) }}"
+                                                    alt="" class="img-fluid">
+                                            @else
+                                                <img class="p-2" src="{{ asset('uploads/default.png') }}" alt=""
+                                                    class="img-fluid">
+                                            @endif
+                                        </div>
+                                        <div class="right">
+                                            <div class="cat-data">
+                                                <h2>{{ $category->name }}</h2>
+                                                {{-- <p>100 Products</p> --}}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                </a>
                             </div>
                         @endforeach
                     @else
@@ -149,19 +153,21 @@
                 </div>
                 <div class="row pb-3">
                     @if ($featuredProducts->isNotEmpty())
-                        @foreach ($featuredProducts as $featuredProducts)
+                        @foreach ($featuredProducts as $featuredProduct)
                             <div class="col-md-3">
                                 <div class="card product-card">
                                     <div class="product-image position-relative">
                                         @php
-                                            $productImage = $featuredProducts->product_images->first();
+                                            $productImage = $featuredProduct->product_images->first();
                                         @endphp
                                         @if (!empty($productImage->image))
-                                            <a href="" class="product-img"><img class="card-img-top"
+                                            <a href="{{ route('front.product', $featuredProduct->slug) }}"
+                                                class="product-img"><img class="card-img-top"
                                                     src="{{ asset('uploads/products/small/' . $productImage->image) }}"
                                                     alt=""></a>
                                         @else
-                                            <a href="" class="product-img"><img class="card-img-top p-2"
+                                            <a href="{{ route('front.product', $featuredProduct->slug) }}"
+                                                class="product-img"><img class="card-img-top p-2"
                                                     src="{{ asset('uploads/default.png') }}" alt=""></a>
                                         @endif
 
@@ -175,12 +181,12 @@
                                     </div>
 
                                     <div class="card-body text-center mt-3">
-                                        <a class="h6 link" href="product.php">{{ $featuredProducts->title }}</a>
+                                        <a class="h6 link" href="product.php">{{ $featuredProduct->title }}</a>
                                         <div class="price mt-2">
                                             <span
-                                                class="h5"><strong>Rupees:{{ $featuredProducts->price }}</strong></span>
+                                                class="h5"><strong>Rs: :{{ $featuredProduct->price }}</strong></span>
                                             <span
-                                                class="h6 text-underline"><del>Rupees:{{ $featuredProducts->compare_price }}</del></span>
+                                                class="h6 text-underline"><del>Rs: :{{ $featuredProduct->compare_price }}</del></span>
                                         </div>
                                     </div>
 
@@ -196,6 +202,7 @@
 
                 </div>
             </div>
+
         </section>
 
         <section class="section-4 pt-5">
@@ -217,9 +224,8 @@
                                                     src="{{ asset('uploads/products/small/' . $productImage->image) }}"
                                                     alt=""></a>
                                         @else
-                                        <a href="" class="product-img"><img class="card-img-top p-2"
-                                                    src="{{ asset('uploads/default.png') }}"
-                                                    alt=""></a>
+                                            <a href="" class="product-img"><img class="card-img-top p-2"
+                                                    src="{{ asset('uploads/default.png') }}" alt=""></a>
                                         @endif
 
                                         <a class="whishlist" href="222"><i class="far fa-heart"></i></a>
@@ -233,10 +239,10 @@
                                     <div class="card-body text-center mt-3">
                                         <a class="h6 link" href="product.php">{{ $product->title }}</a>
                                         <div class="price mt-2">
-                                            <span class="h5"><strong>${{ $product->price }}</strong></span>
-                                            @if ($product->compacre_price > 0)
+                                            <span class="h5"><strong>Rs: {{ $product->price }}</strong></span>
+                                            @if ($product->compare_price > 0)
                                                 <span
-                                                    class="h6 text-underline"><del>${{ $product->compacre_price }}</del></span>
+                                                    class="h6 text-underline"><del>Rs: {{ $product->compare_price }}</del></span>
                                             @endif
                                         </div>
                                     </div>
