@@ -16,3 +16,10 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+
+* text=auto
+*.php text eol=lf
+*.js text eol=lf
+*.css text eol=lf
+*.blade.php text eol=lf
+

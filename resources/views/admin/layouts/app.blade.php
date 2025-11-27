@@ -12,9 +12,11 @@
     <link rel="stylesheet" href="{{ asset('admin-assets/plugins/fontawesome-free/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('admin-assets/plugins/dropzone/min/dropzone.min.css') }}">
     <!-- Theme style -->
+    <link rel="stylesheet" href="{{ asset('admin-assets/plugins/summernote/summernote-bs4.min.css') }}">
+
     <link rel="stylesheet" href="{{ asset('admin-assets/css/adminlte.min.css') }}">
     <link rel="stylesheet" href="{{ asset('admin-assets/css/custom.css') }}">
-    
+
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
@@ -84,38 +86,48 @@
     <!-- ./wrapper -->
 
     <!-- jQuery -->
+    {{-- <script src="https://code.jquery.com/jquery-3.7.0.min.js"
+        integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script> --}}
 
     <script src="{{ asset('admin-assets/plugins/jquery/jquery.min.js') }}"></script>
     <!-- Bootstrap 4 -->
     <script src="{{ asset('admin-assets/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    
+    <script src="{{ asset('admin-assets/js/adminlte.min.js') }}"></script>
+
     <!-- dropzone -->
     <script src="{{ asset('admin-assets/plugins/dropzone/min/dropzone.min.js') }}"></script>
     <!-- AdminLTE App -->
-    <script src="{{ asset('admin-assets/js/adminlte.min.js') }}"></script>
     <!-- AdminLTE for demo purposes -->
     <script src="{{ asset('admin-assets/js/demo.js') }}"></script>
 
+    <script src="{{ asset('admin-assets/plugins/summernote/summernote-bs4.min.js') }}"></script>
     <!-- load jQuery first -->
-    <script src="{{ asset('admin-assets/plugins/jquery/jquery.min.js') }}"></script>
 
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g="
-        crossorigin="anonymous"></script>
 
 
     <script>
-    $(function () {
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') || '{{ csrf_token() }}'
-            }
+        $(function() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') || '{{ csrf_token() }}'
+                }
+            });
         });
-    });
-</script>
+
+        Dropzone.autoDiscover = false;
+
+        $(document).ready(function() {
+            $(".summernote").summernote({
+                height: 250
+
+            });
+        });
+    </script>
+
 
 
     @yield('customJs')
-    
+
 </body>
 
 </html>
