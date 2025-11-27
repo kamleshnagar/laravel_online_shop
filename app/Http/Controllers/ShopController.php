@@ -69,7 +69,7 @@ class ShopController extends Controller
             if ($sort === 'latest') {
                 $products = $products->orderBy('id', 'DESC');
             } elseif ($sort === 'price_asc') {
-                $products = $products->orderBy('price', 'ASC'); // price ASC (fixed)
+                $products = $products->orderBy('price', 'ASC');
             } elseif ($sort === 'price_desc') {
                 $products = $products->orderBy('price', 'DESC');
             } else {
@@ -79,18 +79,27 @@ class ShopController extends Controller
             $products = $products->orderBy('id', 'DESC');
         }
 
-        $products = $products->paginate(10)->withQueryString(); // keep query string for pagination links
+        $products = $products->paginate(6)->withQueryString();
 
         $data['categories'] = $categories;
         $data['brands'] = $brands;
         $data['products'] = $products;
         $data['categorySelected'] = $categorySelected;
         $data['subCategorySelected'] = $subCategorySelected;
-        $data['priceMax'] = $priceMax ?? 5000;
+        $data['priceMax'] = $priceMax ?? 100000;
         $data['priceMin'] = $priceMin ?? 0;
         $data['brandsArray'] = $brandsArray;
         $data['sort'] = $request->get('sort');
 
         return view('front.shop', $data);
+    }
+
+    public function product($slug)
+    {
+        $product = Product::where('slug', $slug)->with(['product_images',])->first();
+        if ($product == null) {
+            abort(404);
+        }
+        return view('front.product', compact('product'));
     }
 }

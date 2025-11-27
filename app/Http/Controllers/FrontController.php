@@ -13,6 +13,7 @@ class FrontController extends Controller
         //FETCH FEATURED PRODUCTS
         $featuredProducts = Product::orderBy('id', 'DESC')
         ->where(['status' => 1 , 'is_featured' => 'Yes'])
+        ->take(8)
         ->get();
         $data['featuredProducts'] = $featuredProducts;
 

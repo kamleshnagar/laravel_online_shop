@@ -8,7 +8,7 @@
             <div class="container">
                 <div class="light-font">
                     <ol class="breadcrumb primary-color mb-0">
-                        <li class="breadcrumb-item"><a class="white-text" href="#">Home</a></li>
+                        <li class="breadcrumb-item"><a class="white-text" href="{{ route('front.home') }}">Home</a></li>
                         <li class="breadcrumb-item active">Shop</li>
                     </ol>
                 </div>
@@ -31,12 +31,16 @@
                                             @foreach ($categories as $key => $category)
                                                 @if ($category->sub_categories->isNotEmpty())
                                                     <h2 class="accordion-header" id="headingOne">
-                                                        <button class="accordion-button collapsed " type="button"
-                                                            data-bs-toggle="collapse"
+                                                        <a href="{{ route('front.shop', $category->slug) }}">
+                                                        <button
+                                                            class="accordion-button collapsed {{ $categorySelected == $category->id ? 'text-primary' : '' }}"
+                                                            type="button" data-bs-toggle="collapse"
                                                             data-bs-target="#collapse-{{ $key }}"
                                                             aria-expanded="false" aria-controls="collapseOne">
+
                                                             {{ $category->name }}
                                                         </button>
+                                                        </a>
                                                     </h2>
                                                 @else
                                                     <a href="{{ route('front.shop', $category->slug) }}"
@@ -101,14 +105,24 @@
 
 
                             {{-- sorting dropdown --}}
-                            <div class="col-12 pb-1">
+                            <div class="col-6 pb-1">
+                                <div class="d-flex align-items-center justify-content-start mb-4">
+                                    <div class="ml-2">
+                                        <a href= "{{ route('front.shop') }}" class=" btn bg-white border rounded">Reset Filters</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 pb-1">
                                 <div class="d-flex align-items-center justify-content-end mb-4">
                                     <div class="ml-2">
-                                       
+
                                         <select name="sort" id="sort" class="form-control">Sort
-                                            <option {{ ($sort =='latest') ? 'selected' : '' }} value="latest">Latest</option>
-                                            <option {{ ($sort =='price_desc') ? 'selected' : '' }} value="price_desc">Price Hight</option>
-                                            <option {{ ($sort =='price_asc') ? 'selected' : '' }} value="price_asc">Price Low</option>
+                                            <option {{ $sort == 'latest' ? 'selected' : '' }} value="latest">Latest
+                                            </option>
+                                            <option {{ $sort == 'price_desc' ? 'selected' : '' }} value="price_desc">Price
+                                                Hight</option>
+                                            <option {{ $sort == 'price_asc' ? 'selected' : '' }} value="price_asc">Price
+                                                Low</option>
                                         </select>
 
 
@@ -126,7 +140,7 @@
                                         <div class="card product-card">
                                             <div class="product-image position-relative">
 
-                                                <a href="" class="product-img">
+                                                <a href="{{ route('front.product',$product->slug) }}" class="product-img">
 
                                                     <img class="card-img-top"
                                                         src="{{ asset(!empty($productImage->image) ? 'uploads/products/small/' . $productImage->image : 'uploads/default.png') }}"
@@ -160,18 +174,9 @@
 
                             <div class="col-md-12 pt-5">
                                 <nav aria-label="Page navigation example">
-                                    <ul class="pagination justify-content-end">
-                                        <li class="page-item disabled">
-                                            <a class="page-link" href="#" tabindex="-1"
-                                                aria-disabled="true">Previous</a>
-                                        </li>
-                                        <li class="page-item"><a class="page-link" href="#">1</a></li>
-                                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                        <li class="page-item">
-                                            <a class="page-link" href="#">Next</a>
-                                        </li>
-                                    </ul>
+
+                                    {{ $products->links() }}
+
                                 </nav>
                             </div>
                         </div>
@@ -224,10 +229,10 @@
             if (brands.length > 0) {
                 url += '&brand=' + brands.toString();
             }
-            
+
             //sorting
-            
-            url += '&sort='+$("#sort").val();
+
+            url += '&sort=' + $("#sort").val();
 
 
 
