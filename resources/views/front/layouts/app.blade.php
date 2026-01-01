@@ -31,6 +31,8 @@
     <meta name="twitter:image" content="" />
     <meta name="twitter:image:alt" content="" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
 
 
     <link rel="stylesheet" type="text/css" href="{{ asset('front-assets/css/slick.css') }}" />
@@ -49,6 +51,7 @@
 
     <!-- Fav Icon -->
     <link rel="shortcut icon" type="image/x-icon" href="#" />
+
 </head>
 
 <body data-instant-intensity="mousedown">
@@ -116,7 +119,8 @@
                                     <ul class="dropdown-menu dropdown-menu-dark">
                                         @foreach ($category->sub_categories as $sub_category)
                                             <li><a class="dropdown-item nav-link"
-                                                    href="{{ route('front.shop', [$category->slug,$sub_category->slug]) }}">{{ $sub_category->name }}</a></li>
+                                                    href="{{ route('front.shop', [$category->slug, $sub_category->slug]) }}">{{ $sub_category->name }}</a>
+                                            </li>
                                         @endforeach
                                 @endif
                         </ul>
@@ -127,14 +131,22 @@
 
                 </div>
                 <div class="right-nav py-0">
-                    <a href="cart.php" class="ml-3 d-flex pt-2">
-                        <i class="fas fa-shopping-cart text-primary"></i>
+                    <a href="{{ route('front.cart') }}" class="ml-3 d-flex pt-2">
+                        <i class="fas fs-5 fa-shopping-cart text-primary"></i>
                     </a>
                 </div>
+                @php
+                    $cartCount = Cart::count();
+                @endphp
+                <span
+                    class=" {{ $cartCount != 0 ? '' : 'd-none' }} cart-badge badge bg-danger position-absolute top-10 start-100 translate-middle rounded-pill">
+                    {{ $cartCount }}
+                </span>
             </nav>
         </div>
     </header>
 
+    <div class="mini-alert"></div>
 
 
 
@@ -201,6 +213,15 @@
     <script src="{{ asset('front-assets/js/ion.rangeSlider.js') }}"></script>
     <script src="{{ asset('front-assets/js/ion.rangeSlider.min.js') }}"></script>
     <script>
+        $(function() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') || '{{ csrf_token() }}'
+                }
+            });
+        });
+
+
         window.onscroll = function() {
             myFunction()
         };
@@ -215,7 +236,115 @@
                 navbar.classList.remove("sticky");
             }
         }
+
+        function addToCart(id) {
+
+            $.ajax({
+                url: '{{ route('front.addToCart') }}',
+                type: 'POST',
+                data: {
+                    id: id,
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                dataType: 'json',
+                success: function(response) {
+
+                    // redirect if needed
+
+                    if (response.cartCount > 0) {
+                        $('.cart-badge').removeClass('d-none');
+                        $('.cart-badge').text(response.cartCount);
+                    } else {
+                        $('.cart-badge').addClass('d-none');
+
+                    }
+
+                    // success alert
+                    let html = '';
+                    if (response.status === true) {
+                        html = `
+                    <div class="alert alert-success mini-cart-alert">
+                        <strong>Success!</strong> ${response.message}</div>
+                    `;
+
+                    } else {
+                        html = `
+                    <div class="alert alert-success mini-cart-alert">
+                        <strong>Success!</strong>something wrong
+                    </div>
+                    `
+                    }
+                    $('.mini-alert')
+                        .html(html)
+                        .fadeIn();
+
+                    // auto fadeout after 3 seconds
+                    setTimeout(() => {
+                        $('.mini-cart-alert').fadeOut(500, function() {
+                            $(this).remove();
+                        });
+                    }, 3000);
+                }
+            });
+
+
+        }
+
+        function deleteCartItem(rowId) {
+            $.ajax({
+                url: '{{ route('front.deletCartItem') }}',
+                type: 'POST',
+                data: {
+                    rowId: rowId,
+                    // _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                dataType: 'json',
+                success: function(response) {
+
+                    if (response.cartCount > 0) {
+                        $('.cart-badge').text(response.cartCount);
+                    } else {
+                        $('.cart-badge').addClass('d-none');
+                        let norecord =
+                            `<tr >
+                                    <td colspan="5">
+                                            <p>No records</p>
+                                    </td>
+                                </tr>`;
+                        $('#cart-table').html(norecord);
+                    }
+
+
+
+                    // success alert
+                    let html = '';
+                    if (response.status === true) {
+                        $('#cartItemRowId-' + rowId).remove();
+                        html = `
+                    <div class="alert alert-success mini-cart-alert">
+                        <strong>Success!</strong> ${response.message}</div>
+                    `;
+                    } else {
+                        html = `
+                    <div class="alert alert-success mini-cart-alert">
+                        <strong>Success!</strong>something wrong
+                    </div>
+                    `
+                    }
+                    $('.mini-alert')
+                        .html(html)
+                        .fadeIn();
+                    // auto fadeout after 3 seconds
+                    setTimeout(() => {
+                        $('.mini-cart-alert').fadeOut(500, function() {
+                            $(this).remove();
+                        });
+                    }, 6000);
+                }
+            });
+        };
     </script>
+
 
     @yield('customJs')
 

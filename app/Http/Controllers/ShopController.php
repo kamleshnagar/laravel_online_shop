@@ -32,7 +32,6 @@ class ShopController extends Controller
                 $products = $products->where('category_id', $category->id);
                 $categorySelected = $category->id;
             }
-
         }
 
         if (! empty($subCategorySlug)) {
@@ -60,7 +59,6 @@ class ShopController extends Controller
             }
 
             $products = $products->whereBetween('price', [$priceMin, $priceMax]);
-
         }
 
         if ($request->filled('sort')) {
@@ -100,6 +98,13 @@ class ShopController extends Controller
         if ($product == null) {
             abort(404);
         }
-        return view('front.product', compact('product'));
+
+        $relatedProducts = null;
+        if ($product->related_products != '') {
+            $productArray = explode(',', $product->related_products);
+            $relatedProducts = Product::whereIn('id', $productArray)->with('product_images')->get();
+        }
+
+        return view('front.product', compact('product','relatedProducts'));
     }
 }

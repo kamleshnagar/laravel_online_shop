@@ -47,20 +47,21 @@
                 </form>
 
             </div>
-            <div class="card-body table-responsive p-0">
-                <table class="table table-hover text-nowrap">
-                    <thead>
-                        <tr>
-                            <th width="60">ID</th>
-                            <th>Name</th>
-                            <th>Slug</th>
-                            <th width="100">Status</th>
-                            <th width="100">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            @if ($categories->isNotEmpty())
+                <div class="card-body table-responsive p-0">
+                    <table class="table table-hover text-nowrap">
+                        <thead>
+                            <tr>
+                                <th width="60">ID</th>
+                                <th>Name</th>
+                                <th>Slug</th>
+                                <th width="100">Status</th>
+                                <th width="100">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
 
-                        @if ($categories->isNotEmpty())
+
                             @foreach ($categories as $category)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
@@ -106,12 +107,12 @@
                                     </td>
                                 </tr>
                             @endforeach
-                        @else
-                            <td colspan="5">Record Not Found</td>
-                        @endif
-                    </tbody>
-                </table>
-            </div>
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <td colspan="5">Record Not Found</td>
+            @endif
             <div class="card-footer clearfix">
                 {{ $categories->links() }}
 

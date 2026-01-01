@@ -48,24 +48,25 @@
 
                 </form>
             </div>
-            <div class="card-body table-responsive p-0">
-                <table class="table table-hover text-nowrap">
-                    <thead>
-                        <tr>
-                            <th width="60">ID</th>
-                            <th width="80">Image</th>
-                            <th>Product</th>
-                            <th>Brand</th>
-                            <th>Price</th>
-                            <th>Qty</th>
-                            <th>SKU</th>
-                            <th width="100">Status</th>
-                            <th width="100">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+            @if ($products->isNotEmpty())
+                <div class="card-body table-responsive p-0">
+                    <table class="table table-hover text-nowrap">
+                        <thead>
+                            <tr>
+                                <th width="60">ID</th>
+                                <th width="80">Image</th>
+                                <th>Product</th>
+                                <th>Brand</th>
+                                <th>Price</th>
+                                <th>Qty</th>
+                                <th>SKU</th>
+                                <th width="100">Status</th>
+                                <th width="100">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
 
-                        @if ($products->isNotEmpty())
+
                             @foreach ($products as $product)
                                 @php
                                     $productImage = $product->product_images->first();
@@ -128,15 +129,16 @@
                                     </td>
                                 </tr>
                             @endforeach
-                        @else
-                            <div class="col-md-12 bg-white p-2 m-2 rounded text-center">
-                                <p>Record Not Found.</p>
-                            </div>
-                        @endif
 
-                    </tbody>
-                </table>
-            </div>
+
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <div class="col-md-12 bg-white p-2 m-2 rounded text-center">
+                    <p>Record Not Found.</p>
+                </div>
+            @endif
             <div class="card-footer clearfix">
                 {{ $products->links() }}
             </div>

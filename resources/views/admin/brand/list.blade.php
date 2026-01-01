@@ -39,19 +39,20 @@
                         </div>
                     </div>
                 </form>
-                <div class="card-body table-responsive p-0">
-                    <table class="table table-hover text-nowrap">
-                        <thead>
-                            <tr>
-                                <th width="60">ID</th>
-                                <th>Name</th>
-                                <th>Slug</th>
-                                <th width="100">Status</th>
-                                <th width="100">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (!empty($brands))
+                @if (!empty($brands))
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th width="60">ID</th>
+                                    <th>Name</th>
+                                    <th>Slug</th>
+                                    <th width="100">Status</th>
+                                    <th width="100">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
                                 @foreach ($brands as $brand)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
@@ -98,15 +99,15 @@
                                             </a>
                                         </td>
                                 @endforeach
-                            @else
-                                <div class="col-md-12 bg-white p-2 m-2 rounded text-center">
-                                    <p>No products found.</p>
-                                </div>
-                            @endif
 
-                        </tbody>
-                    </table>
-                </div>
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="col-md-12 bg-white p-2 m-2 rounded text-center">
+                        <p>No products found.</p>
+                    </div>
+                @endif
                 <div class="card-footer clearfix">
                     {{ $brands->links() }}
                 </div>

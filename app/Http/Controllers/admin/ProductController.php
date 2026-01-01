@@ -20,13 +20,12 @@ class ProductController extends Controller
         $products = Product::latest('id')->with(['product_images', 'brand']);
 
         if ($request->get('keyword') !== '') {
-            $products = $products->where('title', 'like', '%'.$request->keyword.'%');
+            $products = $products->where('title', 'like', '%' . $request->keyword . '%');
         }
 
         $products = $products->paginate(10);
 
         return view('admin.products.list', compact('products'));
-
     }
 
     public function create()
@@ -38,7 +37,6 @@ class ProductController extends Controller
         $data['categories'] = $categories;
 
         return view('admin.products.create', $data);
-
     }
 
     public function store(Request $request)
@@ -63,7 +61,9 @@ class ProductController extends Controller
         $product = new Product;
         $product->title = $request->title;
         $product->slug = $request->slug;
+        $product->short_description = $request->short_description;
         $product->description = $request->description;
+        $product->shipping_returns = $request->shipping_returns;
         $product->price = $request->price;
         $product->compare_price = $request->compare_price;
         $product->sku = $request->sku;
@@ -75,6 +75,8 @@ class ProductController extends Controller
         $product->sub_category_id = $request->sub_category;
         $product->brand_id = $request->brand;
         $product->is_featured = $request->is_featured;
+        $product->related_products = (!empty($request->related_products) ? implode(',', $request->related_products) : '');
+
         $product->save();
 
         // save Gallery pics
@@ -89,7 +91,7 @@ class ProductController extends Controller
                 $productImage->product_id = $product->id;
                 $productImage->image = 'NULL';
                 $productImage->save();
-                $imageName = $product->id.'-'.$productImage->id.'-'.time().'.'.$ext;
+                $imageName = $product->id . '-' . $productImage->id . '-' . time() . '.' . $ext;
                 $productImage->image = $imageName;
                 $productImage->save();
 
@@ -97,11 +99,11 @@ class ProductController extends Controller
 
                 // Large Image
 
-                $sourcePath = public_path().'/temp/'.$tempImageInfo->name;
-                $destPath = public_path().'/uploads/products/large/'.$imageName;
+                $sourcePath = public_path() . '/temp/' . $tempImageInfo->name;
+                $destPath = public_path() . '/uploads/products/large/' . $imageName;
 
                 $image = Image::read($sourcePath);
-                $image->resize(1400, null, function ($c) {
+                $image->resize(1080, 1350, function ($c) {
                     $c->aspectRatio();
                     $c->upsize();
                 });
@@ -109,22 +111,20 @@ class ProductController extends Controller
 
                 // Small Image
 
-                $destPath = public_path().'/uploads/products/small/'.$imageName;
+                $destPath = public_path() . '/uploads/products/small/' . $imageName;
                 $image = Image::read($sourcePath);
                 $image->resize(300, 300, function ($c) {
                     $c->aspectRatio();
                     $c->upsize();
                 });
                 $image->save($destPath);
-
             }
         }
 
         return redirect()->back()->with('success', 'Product added successfully');
-
     }
 
-    public function edit($id, Request $request)
+    public function edit($id)
     {
 
         $product = Product::find($id);
@@ -138,12 +138,19 @@ class ProductController extends Controller
         $data = [];
         $categories = Category::orderBy('name', 'ASC')->get();
         $brands = Brand::orderBy('name', 'ASC')->get();
-
+       
+        //fetch related products
+        $relatedProducts = null;
+        if ($product->related_products != '') {
+            $productArray = explode(',', $product->related_products);
+            $relatedProducts = Product::whereIn('id', $productArray)->get();
+        }
         $data['brands'] = $brands;
         $data['product'] = $product;
         $data['categories'] = $categories;
         $data['subCategories'] = $subCategories;
         $data['productImage'] = $productImage;
+        $data['relatedProducts'] = $relatedProducts;
 
         return view('admin.products.edit', $data);
     }
@@ -155,23 +162,25 @@ class ProductController extends Controller
 
         $validation = [
             'title' => 'required',
-            'slug' => 'required|unique:products,slug,'.$product->id.',id',
+            'slug' => 'required|unique:products,slug,' . $product->id . ',id',
             'price' => 'required',
-            'sku' => 'required|unique:products,sku,'.$product->id.',id',
+            'sku' => 'required|unique:products,sku,' . $product->id . ',id',
             'track_qty' => 'required|in:Yes,No',
             'category' => 'required|numeric',
             'is_featured' => 'required',
 
         ];
 
-        if (! empty($request->track_qty) && $request->track_qty == 'Yes') {
+        if (!empty($request->track_qty) && $request->track_qty == 'Yes') {
             $validation['qty'] = 'required|numeric';
         }
 
         $request->validate($validation);
         $product->title = $request->title;
         $product->slug = $request->slug;
+        $product->short_description = $request->short_description;
         $product->description = $request->description;
+        $product->shipping_returns = $request->shipping_returns;
         $product->price = $request->price;
         $product->compare_price = $request->compare_price;
         $product->sku = $request->sku;
@@ -183,10 +192,10 @@ class ProductController extends Controller
         $product->sub_category_id = $request->sub_category;
         $product->brand_id = $request->brand;
         $product->is_featured = $request->is_featured;
+        $product->related_products = (!empty($request->related_products) ? implode(',', $request->related_products) : '');
         $product->save();
 
         return redirect()->route('index.products')->with('success', 'Product Updated successfully');
-
     }
 
     public function destroy($id, Request $request)
@@ -201,8 +210,8 @@ class ProductController extends Controller
         if (! empty($productImages)) {
 
             foreach ($productImages as $productImages) {
-                File::delete(public_path('uploads/products/large/'.$productImages->image));
-                File::delete(public_path('uploads/products/small/'.$productImages->image));
+                File::delete(public_path('uploads/products/large/' . $productImages->image));
+                File::delete(public_path('uploads/products/small/' . $productImages->image));
             }
             ProductImage::where('product_id', $id)->delete();
         }
@@ -210,6 +219,29 @@ class ProductController extends Controller
         $product->delete();
 
         return redirect()->back()->with('success', 'Successfully deleted Product');
+    }
 
+
+    public function getProducts(Request $request)
+    {
+
+        $tempProduct = [];
+        if ($request->q != '') {
+            $products = Product::where('title', 'like', '%' . $request->q . '%')
+                ->select('id', 'title')
+                ->limit(10)
+                ->get();
+
+            if ($products != null) {
+                foreach ($products as $key => $product) {
+                    $tempProduct[] = array('id' => $product->id, 'title' => $product->title);
+                }
+            }
+        }
+
+        return response()->json([
+            'tags' => $tempProduct,
+            'status' => true
+        ]);
     }
 }

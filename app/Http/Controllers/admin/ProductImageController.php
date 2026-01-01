@@ -16,7 +16,7 @@ class ProductImageController extends Controller
         
         $image = $request->image;
         
-        if (! empty($image)) {
+        if (!empty($image)) {
             $ext = $image->getClientOriginalExtension();
             $sourcePath = $image->getPathName();
         }
@@ -59,7 +59,7 @@ class ProductImageController extends Controller
             'message' => 'Product image saved successfully',
 
         ]);
-
+            
     }
 
 

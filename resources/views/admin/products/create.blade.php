@@ -68,11 +68,27 @@
                                             </small>
                                         </div>
                                     </div>
+                                    {{-- < --}}
+
+                                    <div class="col-md-12">
+                                        <div class="mb-3">
+                                            <label for="short_description">Short Description</label>
+                                            <textarea name="short_description" id="short_description" cols="30" rows="10" class="summernote"
+                                                placeholder="Description">  {{ old('short_description') }}</textarea>
+                                        </div>
+                                    </div>
                                     <div class="col-md-12">
                                         <div class="mb-3">
                                             <label for="description">Description</label>
                                             <textarea name="description" id="description" cols="30" rows="10" class="summernote"
                                                 placeholder="Description">  {{ old('description') }}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="mb-3">
+                                            <label for="shipping_returns">Shipping & Returns</label>
+                                            <textarea name="shipping_returns" id="shipping_returns" cols="30" rows="10" class="summernote"
+                                                placeholder="Description">  {{ old('shipping_returns') }}</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -156,6 +172,21 @@
                                                     {{ $message }}
                                                 @enderror
                                             </small>
+                                        </div>
+                                    </div>
+                                    <div class="card mb-3 w-100">
+                                        <div class="card-body">
+                                            <h2 class="h4 mb-3">Related Product</h2>
+                                            <div class="mb-3">
+                                                <select name="related_products[]" id="related_products"
+                                                    class="related-products w-100 text-dark" multiple>
+                                                </select>
+                                                <small class="text-danger">
+                                                    @error('related_products')
+                                                        {{ $message }}
+                                                    @enderror
+                                                </small>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-md-12">
@@ -308,74 +339,112 @@
     <script>
         $(document).ready(function() {
             var oldCat = $('#category')
-        });
 
+            $('.related-products').select2({
+                placeholder: 'Search products',
+                minimumInputLength: 3,
+                width: '100%',
 
-        $('#title').keyup(function(e) {
-            e.preventDefault();
-            let element = $(this);
-            $("button[type=submit]").prop('disabled', true);
+                ajax: {
+                    tags: true,
+                    url: '{{ route('products.getProducts') }}',
+                    multiple: true,
+                    dataType: 'json',
+                    delay: 250,
 
-            $.ajax({
-                url: '{{ route('getSlug') }}',
-                type: 'get',
-                data: {
-                    title: element.val()
-                },
-                dataType: 'json',
-                success: function(response) {
-                    $("button[type=submit]").prop('disabled', false);
+                    data: function(params) {
+                        return {
+                            q: params.term
+                        };
+                    },
 
-                    if (response.status == true) {
-                        $('#slug').val(response.slug);
+                    processResults: function(data) {
+                        return {
+                            results: data.tags.map(item => ({
+                                id: item.id,
+                                text: item.title
+                            }))
+                        };
                     }
-                }
-            });
-        });
-
-       
-
-        $('#category').change(function() {
-            var category_id = $(this).val();
-            $.ajax({
-                url: '{{ route('index.product-subcategories') }}',
-                type: 'get',
-                data: {
-                    category_id: category_id
                 },
-                dataType: 'json',
-                success: function(response) {
 
-                    $('#sub_category').find("option").not(":first").remove();
-                    $.each(response["subCategories"], function(key, item) {
-                        $("#sub_category").append(
-                            `<option value = '${item.id}'>${item.name}</option>`)
-                    });
-                },
-                error: function() {
-                    console.log("Something Went Wrong");
+                createTag: function(params) {
+                    return {
+                        id: params.term,
+                        text: params.term,
+                        newTag: true
+                    };
                 }
             });
 
 
-        });
+
+            $('#title').keyup(function(e) {
+                e.preventDefault();
+                let element = $(this);
+                $("button[type=submit]").prop('disabled', true);
+
+                $.ajax({
+                    url: '{{ route('getSlug') }}',
+                    type: 'get',
+                    data: {
+                        title: element.val()
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        $("button[type=submit]").prop('disabled', false);
+
+                        if (response.status == true) {
+                            $('#slug').val(response.slug);
+                        }
+                    }
+                });
+            });
 
 
-        Dropzone.autoDiscover = false;
 
-        new Dropzone("#image", {
-            url: "{{ route('temp-images.create') }}",
-            maxFiles: 10,
-            paramName: "image",
-            acceptedFiles: "image/*",
-            addRemoveLinks: true,
+            $('#category').change(function() {
+                var category_id = $(this).val();
+                $.ajax({
+                    url: '{{ route('index.product-subcategories') }}',
+                    type: 'get',
+                    data: {
+                        category_id: category_id
+                    },
+                    dataType: 'json',
+                    success: function(response) {
 
-            headers: {
-                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
-            },
-            success: function(file, response) {
+                        $('#sub_category').find("option").not(":first").remove();
+                        $.each(response["subCategories"], function(key, item) {
+                            $("#sub_category").append(
+                                `<option value = '${item.id}'>${item.name}</option>`
+                                )
+                        });
+                    },
+                    error: function() {
+                        console.log("Something Went Wrong");
+                    }
+                });
 
-                var html = ` 
+
+            });
+
+
+            Dropzone.autoDiscover = false;
+
+            new Dropzone("#image", {
+                url: "{{ route('temp-images.create') }}",
+                maxFiles: 10,
+                paramName: "image",
+                acceptedFiles: "image/*",
+                addRemoveLinks: true,
+
+                headers: {
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
+                },
+                success: function(file, response) {
+
+                    var html = ` 
                 <input type="hidden" name="image_array[]" value="${response.image_id}">
                 <div class="col-md-3 text-center " id="image_row-${response.image_id}">
                                 <div class="card">
@@ -386,16 +455,19 @@
                                 </div>
                             </div>`;
 
-                $('#product-gallery').append(html);
-            },
-            complete: function(file) {
-                this.removeFile(file);
-            }
-        });
+                    $('#product-gallery').append(html);
+                },
+                complete: function(file) {
+                    this.removeFile(file);
+                }
+            });
 
-        function deleteImage(id) {
-            console.log(id);
-            $("#image_row-" + id).remove();
-        }
+            function deleteImage(id) {
+                console.log(id);
+                $("#image_row-" + id).remove();
+            }
+
+
+        });
     </script>
 @endsection

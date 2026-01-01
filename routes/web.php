@@ -9,12 +9,14 @@ use App\Http\Controllers\admin\ProductImageController;
 use App\Http\Controllers\admin\ProductSubCategoryController;
 use App\Http\Controllers\admin\SubCategoryController;
 use App\Http\Controllers\admin\TempImagesController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\FrontController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -26,9 +28,12 @@ use Illuminate\Support\Str;
 |
 */
 
-Route::get('/',[FrontController::class,'index'])->name('front.home');
-Route::get('/shop/{categorySlug?}/{subCategorySlug?}',[ShopController::class,'index'])->name('front.shop');
-Route::get('/product/{slug}',[ShopController::class,'product'])->name('front.product');
+Route::get('/', [FrontController::class, 'index'])->name('front.home');
+Route::get('/shop/{categorySlug?}/{subCategorySlug?}', [ShopController::class, 'index'])->name('front.shop');
+Route::get('/product/{slug}', [ShopController::class, 'product'])->name('front.product');
+Route::get('/cart', [CartController::class, 'cart'])->name('front.cart');
+Route::post('/add-to-cart', [CartController::class, 'addToCart'])->name('front.addToCart');
+Route::post('/delete-cart-product', [CartController::class, 'deletCartItem'])->name('front.deletCartItem');
 
 
 
@@ -37,7 +42,6 @@ Route::group(['prefix' => 'admin'], function () {
     Route::group(['middleware' => 'admin.guest'], function () {
         Route::get('/login', [AdminLoginController::class, 'index'])->name('admin.login');
         Route::post('/authenticate', [AdminLoginController::class, 'authenticate'])->name('admin.authenticate');
-
     });
 
     Route::group(['middleware' => 'admin.auth'], function () {
@@ -70,27 +74,31 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/brands/{brand}', [BrandController::class, 'edit'])->name('edit.brand');
         Route::post('/brands/{brand}', [BrandController::class, 'update'])->name('update.brand');
         Route::get('/brands/{category}/delete', [BrandController::class, 'destroy'])->name('delete.brand');
-        
-        
+
+
         //Products Route
         Route::get('/products', [ProductController::class, 'index'])->name('index.products');
         Route::get('/products/create/', [ProductController::class, 'create'])->name('create.product');
         Route::post('/products', [ProductController::class, 'store'])->name('store.product');
         Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('edit.product');
         Route::post('/products/{product}', [ProductController::class, 'update'])->name('update.product');
-        
-        
+
+
         Route::get('/products-subcategories', [ProductSubCategoryController::class, 'index'])->name('index.product-subcategories');
 
         Route::post('/products-update/update', [ProductImageController::class, 'update'])->name('update.product-image');
         Route::delete('/product-delete', [ProductImageController::class, 'destroy'])->name('destroy.product-image');
         Route::get('/product-delete/{product_id}', [ProductController::class, 'destroy'])->name('destroy.product');
 
+        Route::get('/get-products', [ProductController::class, 'getProducts'])->name('products.getProducts');
+
+        Route::resource('/roles', RoleController::class);
+        Route::resource('/users', UserController::class);
 
         Route::get('/getSlug', function (Request $request) {
 
-            $slug='';
-            
+            $slug = '';
+
             if (! empty($request->title)) {
                 $slug = Str::slug($request->title);
             }
@@ -100,6 +108,5 @@ Route::group(['prefix' => 'admin'], function () {
                 'slug' => $slug,
             ]);
         })->name('getSlug');
-
     });
 });

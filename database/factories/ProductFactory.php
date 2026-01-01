@@ -18,21 +18,26 @@ class ProductFactory extends Factory
     public function definition(): array
     {
 
+        
         $title = fake()->unique()->name();
         $slug = Str::slug($title);
-        $subCategories = [1, 2, 3, 4];
+        $subCategories = [4,5,6];
         $subCatRandKey = array_rand($subCategories);
-        $Categories = [5, 6, 4, 7];
-        $CatRandKey = array_rand($subCategories);
-        $price = intval((rand(199, 1999)) / 100) * 100 + 99;
+        $brands = [3,4];
+        $brand = array_rand($brands);
+       
+        $price = intval((rand(199, 19999)) / 100) * 100 + 99;
         $comparePrice =  intval($price + (rand(5,20))*100);
+?>
+   
+        <?php
 
         return [
             'title' => $title,
             'slug' => $slug,
-            'category_id' => 2,
+            'category_id' => 1,
             'sub_category_id' => $subCategories[$subCatRandKey],
-            'brand_id' => $Categories[$CatRandKey],
+            'brand_id' =>$brands[$brand],
             'price' => $price,
             'compare_price' => $comparePrice,
             'sku' => 'SKU-'.rand(1000, 100000),
