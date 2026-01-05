@@ -66,8 +66,25 @@ class CartController extends Controller
             return response()->json([
                 'status' =>  true,
                 'message' =>  'Item deleted successfully',
-                'cartCount'  => Cart::count()?? 0
+                'cartCount'  => Cart::count() ?? 0
             ]);
         }
+    }
+
+
+    public function updateCart(Request $request)
+    {
+        $rowId = $request->rowId;
+        $qty = $request->qty;
+
+        Cart::update($request->rowId, $request->qty);
+        // $cart =  Cart::content();
+        $message = 'Cart Updated Successfully!';
+
+        session()->flash('success', $message);
+        return response()->json([
+            'status' => true,
+            'message' => $message,
+        ]);
     }
 }

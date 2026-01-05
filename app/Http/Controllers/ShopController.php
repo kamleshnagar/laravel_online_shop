@@ -22,10 +22,11 @@ class ShopController extends Controller
         $categories = Category::orderBy('name', 'ASC')->where('status', 1)->with('sub_categories')->get();
         $brands = Brand::orderBy('name', 'ASC')->where('status', 1)->get();
         $products = Product::where('status', 1)->with(['product_images', 'brand']);
-
+      
         // Apply fileres
 
         if (! empty($categorySlug)) {
+            
             $category = Category::where('slug', $categorySlug)->first();
 
             if ($category) {
@@ -88,7 +89,7 @@ class ShopController extends Controller
         $data['priceMin'] = $priceMin ?? 0;
         $data['brandsArray'] = $brandsArray;
         $data['sort'] = $request->get('sort');
-
+       
         return view('front.shop', $data);
     }
 
@@ -105,6 +106,6 @@ class ShopController extends Controller
             $relatedProducts = Product::whereIn('id', $productArray)->with('product_images')->get();
         }
 
-        return view('front.product', compact('product','relatedProducts'));
+        return view('front.product', compact('product', 'relatedProducts'));
     }
 }
