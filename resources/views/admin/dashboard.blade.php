@@ -65,8 +65,10 @@
     </section>
     @endsection
 
-    @section('customJs')
+    @push('customJs')
     <script>
         console.log("Dashboard Page");
     </script>
+
+    @endpush
     <!-- /.content -->

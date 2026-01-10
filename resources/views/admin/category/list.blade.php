@@ -124,7 +124,7 @@
     <!-- /.content -->
 @endsection
 
-@section('customJs')
+@push('customJs')
     <script>
         function deleteCategory(id) {
 
@@ -153,4 +153,4 @@
 
         }
     </script>
-@endsection
+@endpush

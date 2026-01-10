@@ -100,32 +100,33 @@
         </li> -->
 
                     @if (getCategories()->isNotEmpty())
-                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                            @foreach (getCategories() as $category)
-                                @if ($category->sub_categories->isNotEmpty())
-                                    <li class="nav-item dropdown">
-                                        <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown"
-                                            aria-expanded="false">
-                                            {{ $category->name }}
-                                        </button>
-                                    @else
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{{ route('front.shop', $category->slug) }}"
-                                            title="{{ $category->name }}">{{ $category->name }}</a>
-                                    </li>
-                                @endif
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        @foreach (getCategories() as $category)
+                        @if ($category->sub_categories->isNotEmpty())
+                        <li class="nav-item dropdown">
+                            <button class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                {{ $category->name }}
+                            </button>
+                            @else
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('front.shop', $category->slug) }}"
+                                title="{{ $category->name }}">{{ $category->name }}</a>
+                        </li>
+                        @endif
 
-                                @if ($category->sub_categories->isNotEmpty())
-                                    <ul class="dropdown-menu dropdown-menu-dark">
-                                        @foreach ($category->sub_categories as $sub_category)
-                                            <li><a class="dropdown-item nav-link"
-                                                    href="{{ route('front.shop', [$category->slug, $sub_category->slug]) }}">{{ $sub_category->name }}</a>
-                                            </li>
-                                        @endforeach
-                                @endif
+                        @if ($category->sub_categories->isNotEmpty())
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            @foreach ($category->sub_categories as $sub_category)
+                            <li><a class="dropdown-item nav-link"
+                                    href="{{ route('front.shop', [$category->slug, $sub_category->slug]) }}">{{
+                                    $sub_category->name }}</a>
+                            </li>
+                            @endforeach
+                            @endif
                         </ul>
                         {{-- </li> --}}
-                    @endforeach)
+                        @endforeach)
                     </ul>
                     @endif
 
@@ -136,7 +137,7 @@
                     </a>
                 </div>
                 @php
-                    $cartCount = Cart::count();
+                $cartCount = Cart::count();
                 @endphp
                 <span
                     class=" {{ $cartCount != 0 ? '' : 'd-none' }} cart-badge badge bg-danger position-absolute top-10 start-100 translate-middle rounded-pill">
@@ -256,24 +257,22 @@
                         $('.cart-badge').text(response.cartCount);
                     } else {
                         $('.cart-badge').addClass('d-none');
-
                     }
 
-                    // success alert
-                    let html = '';
-                    if (response.status === true) {
-                        html = `
-                    <div class="alert alert-success mini-cart-alert">
-                        <strong>Success!</strong> ${response.message}</div>
+                    showAlert(response.status, response.message?? response.error);
+
+                }
+            });
+        }
+
+
+        function showAlert(status, message) {
+            
+                     let html = `
+                    <div class="alert ${status ? 'alert-success' : 'alert-danger'} mini-cart-alert">
+                        <strong>Success!</strong> ${message}</div>
                     `;
-
-                    } else {
-                        html = `
-                    <div class="alert alert-success mini-cart-alert">
-                        <strong>Success!</strong>something wrong
-                    </div>
-                    `
-                    }
+                    
                     $('.mini-alert')
                         .html(html)
                         .fadeIn();
@@ -284,69 +283,12 @@
                             $(this).remove();
                         });
                     }, 3000);
-                }
-            });
+    }
 
-
-        }
-
-        function deleteCartItem(rowId) {
-            $.ajax({
-                url: '{{ route('front.deletCartItem') }}',
-                type: 'POST',
-                data: {
-                    rowId: rowId,
-                    // _token: $('meta[name="csrf-token"]').attr('content')
-                },
-                dataType: 'json',
-                success: function(response) {
-
-                    if (response.cartCount > 0) {
-                        $('.cart-badge').text(response.cartCount);
-                    } else {
-                        $('.cart-badge').addClass('d-none');
-                        let norecord =
-                            `<tr >
-                                    <td colspan="5">
-                                            <p>No records</p>
-                                    </td>
-                                </tr>`;
-                        $('#cart-table').html(norecord);
-                    }
-
-
-
-                    // success alert
-                    let html = '';
-                    if (response.status === true) {
-                        $('#cartItemRowId-' + rowId).remove();
-                        html = `
-                    <div class="alert alert-success mini-cart-alert">
-                        <strong>Success!</strong> ${response.message}</div>
-                    `;
-                    } else {
-                        html = `
-                    <div class="alert alert-success mini-cart-alert">
-                        <strong>Success!</strong>something wrong
-                    </div>
-                    `
-                    }
-                    $('.mini-alert')
-                        .html(html)
-                        .fadeIn();
-                    // auto fadeout after 3 seconds
-                    setTimeout(() => {
-                        $('.mini-cart-alert').fadeOut(500, function() {
-                            $(this).remove();
-                        });
-                    }, 6000);
-                }
-            });
-        };
     </script>
 
 
-    @yield('customJs')
+    @stack('customJs')
 
 </body>
 

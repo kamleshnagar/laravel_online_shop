@@ -8,7 +8,21 @@
     <section class=" section-9 pt-4">
         <div class="container">
             <div class="row">
-                <div class="col-md-8">
+                <div class="col-md-8 cart-wrapper">
+                    @if($cartContent->isEmpty())
+                    <div class="card w-100 h-100 text-center shadow">
+                        <div class="card-body d-flex flex-column justify-content-center align-items-center ">
+                            <h4 class="card-title mb-2">Your cart is empty</h4>
+                            <p class="text-muted mb-4">
+                                Looks like you haven’t added anything to your cart yet.
+                            </p>
+                            <a href="{{ route('front.shop') }}" class="btn btn-primary">
+                                Continue Shopping
+                            </a>
+                        </div>
+                    </div>
+                    @else
+
                     <div class="table-responsive">
                         <table class="table" id="cart">
                             <thead>
@@ -57,7 +71,7 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td>
+                                    <td id="item-total-{{ $item->rowId }}" class="">
                                         ₹{{ number_format($item->price * $item->qty, 2) }}
                                     </td>
                                     <td>
@@ -71,6 +85,7 @@
                             </tbody>
                         </table>
                     </div>
+                    @endif
                 </div>
                 <div class="col-md-4">
                     <div class="card cart-summery">
@@ -80,18 +95,18 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between pb-2">
                                 <div>Subtotal</div>
-                                <div>₹400</div>
+                                <div class="cart-subtotal">₹{{ Cart::subtotal(); }}</div>
                             </div>
                             <div class="d-flex justify-content-between pb-2">
                                 <div>Shipping</div>
-                                <div>₹20</div>
+                                <div>₹0</div>
                             </div>
                             <div class="d-flex justify-content-between summery-end">
                                 <div>Total</div>
-                                <div>₹420</div>
+                                <div class="cart-subtotal">₹{{ Cart::subtotal(); }}</div>
                             </div>
                             <div class="pt-5">
-                                <a href="login.php" class="btn-dark btn btn-block w-100">Proceed to Checkout</a>
+                                <a href="{{ route('front.checkout') }}" class="btn-dark btn btn-block w-100">Proceed to Checkout</a>
                             </div>
                         </div>
                     </div>
@@ -108,7 +123,7 @@
 @endsection
 
 
-@section('customJs')
+@push('customJs')
 <script>
     $('.add').click(function(){
         let qtyElement = $(this).parent().prev(); //Qty Input
@@ -127,10 +142,10 @@
         let qtyValue = parseInt(qtyElement.val());
         if(qtyValue > 1){
             qtyElement.val(qtyValue-1)
-            
             let rowId = $(this).data('id'); //Qty Input
             let newQty = qtyElement.val(); //Qty Input
             updateCart(rowId,newQty);
+           
         }
     });
 
@@ -138,15 +153,77 @@
         $.ajax({
             url: '{{ route('front.updateCart') }}',
             type: 'post',
-            datatType: 'json',
+            dataType: 'json',
             data:{rowId:rowId,qty:newQty},
             success:function(response){
                 if(response.status ==true){
-                    window.location.href = '{{ route('front.cart') }}';
+                    // window.location.href = '{{ route('front.cart') }}';
+                    $('.cart-subtotal').text(
+                        '₹' + Number(response.total).toFixed(2)
+                        );
+
+                    $('#item-total-' + rowId).text(
+                            '₹' + Number(response.product_total).toFixed(2)
+                        );
+
+                    showAlert(response.status,response.message);
+                }else{
+                     showAlert(response.status,response.error);
                 }
             }
         });
     }
 
+    
+        function deleteCartItem(rowId) {
+            $.ajax({
+                url: '{{ route('front.deletCartItem') }}',
+                type: 'POST',
+                data: {
+                    rowId: rowId
+                },
+                dataType: 'json',
+                success: function(response) {
+
+                    if (response.cartCount > 0) {
+                        $('.cart-badge').text(response.cartCount);
+                    } else {
+                        $('.cart-badge').addClass('d-none');
+                        let norecord =
+                            `<div class="card w-100 h-100 text-center shadow">
+                        <div class="card-body d-flex flex-column justify-content-center align-items-center ">
+                            <h4 class="card-title mb-2">Your cart is empty</h4>
+                            <p class="text-muted mb-4">
+                                Looks like you haven’t added anything to your cart yet.
+                            </p>
+                            <a href="{{ route('front.shop') }}" class="btn btn-primary">
+                                Continue Shopping
+                            </a>
+                        </div>
+                    </div>`;
+                        $('.cart-wrapper').html(norecord);
+                    }
+
+                    if(response.status == true){
+                        
+                        $('.cart-subtotal').text(
+                       '₹' + Number(response.total).toFixed(2)
+                       );
+
+                        $('#cartItemRowId-' + rowId).remove();
+
+
+                        showAlert(response.status,response.message);
+
+                    }else{
+                        showAlert(response.status,response.error);
+                    }   
+                  
+                }
+            });
+        };
+
+     
+
 </script>
-@endsection
+@endpush

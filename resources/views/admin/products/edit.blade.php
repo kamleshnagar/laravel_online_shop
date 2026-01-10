@@ -345,7 +345,7 @@
     <!-- /.content-wrapper -->
 @endsection
 
-@section('customJs')
+@push('customJs')
     <script>
         $('.related-products').select2({
             placeholder: 'Search products',
@@ -499,4 +499,4 @@
 
         }
     </script>
-@endsection
+@endpush

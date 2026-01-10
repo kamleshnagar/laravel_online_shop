@@ -9,6 +9,7 @@ use App\Http\Controllers\admin\ProductImageController;
 use App\Http\Controllers\admin\ProductSubCategoryController;
 use App\Http\Controllers\admin\SubCategoryController;
 use App\Http\Controllers\admin\TempImagesController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\FrontController;
 use App\Http\Controllers\RoleController;
@@ -28,6 +29,19 @@ use Illuminate\Support\Str;
 |
 */
 
+Route::get('/register', [AuthController::class, 'register'])->name('account.register');
+Route::post('/register', [AuthController::class, 'processRegister'])->name('account.processRegister');
+Route::get('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/login', [AuthController::class, 'loginProcess'])->name('account.loginProcess');
+
+
+Route::group(['middleware' => 'auth'], function () {
+    Route::get('/profile', [AuthController::class, 'profile'])->name('account.profile');
+    Route::get('/logout', [AuthController::class, 'logout'])->name('account.logout');
+    Route::get('/checkout', [CartController::class, 'checkout'])->name('front.checkout');
+    Route::post('/process-checkout', [CartController::class, 'processCheckout'])->name('front.processCheckout');
+});
+
 Route::get('/', [FrontController::class, 'index'])->name('front.home');
 Route::get('/shop/{categorySlug?}/{subCategorySlug?}', [ShopController::class, 'index'])->name('front.shop');
 Route::get('/product/{slug}', [ShopController::class, 'product'])->name('front.product');
@@ -36,6 +50,7 @@ Route::post('/add-to-cart', [CartController::class, 'addToCart'])->name('front.a
 Route::post('/delete-cart-product', [CartController::class, 'deletCartItem'])->name('front.deletCartItem');
 Route::post('/update-cart', [CartController::class, 'updateCart'])->name('front.updateCart');
 
+Route::get('/login}', [ShopController::class, 'index'])->name('front.shop');
 
 
 

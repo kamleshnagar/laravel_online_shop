@@ -154,6 +154,6 @@
 
     </main>
 @endsection
-@section('customJs')
+@push('customJs')
    
-@endsection
+@endpush

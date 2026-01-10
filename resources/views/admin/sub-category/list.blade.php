@@ -127,7 +127,7 @@
     <!-- /.content -->
 @endsection
 
-@section('customJs')
+@push('customJs')
     <script>
         function deleteSubCategory(id) {
             let url = '{{ route('sub-categories.delete', ['subCategory' => ':id']) }}';
@@ -152,4 +152,4 @@
             });
         }
     </script>
-@endsection
+@endpush

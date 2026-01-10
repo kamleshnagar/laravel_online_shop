@@ -335,7 +335,7 @@
 
 @endsection
 
-@section('customJs')
+@push('customJs')
     <script>
         $(document).ready(function() {
             var oldCat = $('#category')
@@ -470,4 +470,4 @@
 
         });
     </script>
-@endsection
+@endpush

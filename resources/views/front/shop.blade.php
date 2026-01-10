@@ -188,7 +188,7 @@
 @endsection
 
 
-@section('customJs')
+@push('customJs')
     <script>
         renageSilider = $(".js-range-slider").ionRangeSlider({
             type: "double",
@@ -247,4 +247,4 @@
 
         });
     </script>
-@endsection
+@endpush

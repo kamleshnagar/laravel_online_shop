@@ -87,7 +87,7 @@
     <!-- /.content -->
 @endsection
 
-@section('customJs')
+@push('customJs')
     <script>
         $('#categoryForm').submit(function(e) {
             e.preventDefault();
@@ -195,4 +195,4 @@
     </script>
 
     // <!-- /.content -->
-@endsection
+@endpush

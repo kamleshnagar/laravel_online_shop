@@ -263,5 +263,5 @@
     </main>
 @endsection
 
-@section('customJs')
-@endsection
+@push('customJs')
+@endpush

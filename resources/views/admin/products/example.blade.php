@@ -292,7 +292,7 @@
     {{ session() }}
 @endsection
 
-@section('customJs')
+@push('customJs')
     <script>
         // --- slug ajax (unchanged) ---
         $('#title').keyup(function(e) {
@@ -406,4 +406,4 @@
             $("#image_row-" + id).remove();
         }
     </script>
-@endsection
+@endpush

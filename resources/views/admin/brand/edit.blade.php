@@ -70,7 +70,7 @@
     <!-- /.content -->
 @endsection
 
-@section('customJs')
+@push('customJs')
     <script>
 
         $('#name').keyup(function(e) {
@@ -98,4 +98,4 @@
 
         Dropzone.autoDiscover = false;
     </script>
-@endsection
+@endpush
