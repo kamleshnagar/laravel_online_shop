@@ -68,7 +68,7 @@
 
                                         <div class="form-check mt-2">
                                             <input name="saved_address" class="form-check-input" type="radio"
-                                                value="new" id="new_address" {{ old('saved_address')==='new' ? 'checked'
+                                                value="new" id="new_address" {{( old('saved_address')==='new' || empty($shippingAddress)) ? 'checked'
                                                 : '' }}>
                                             <label class="form-check-label" for="new_address">
                                                 Use new address

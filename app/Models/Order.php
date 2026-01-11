@@ -41,4 +41,10 @@ class Order extends Model
         /* ===== Order Status ===== */
         'status',
     ];
+
+
+    public function items()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
 }

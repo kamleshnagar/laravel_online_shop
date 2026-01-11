@@ -40,6 +40,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/logout', [AuthController::class, 'logout'])->name('account.logout');
     Route::get('/checkout', [CartController::class, 'checkout'])->name('front.checkout');
     Route::post('/process-checkout', [CartController::class, 'processCheckout'])->name('front.processCheckout');
+    Route::get('/thank-you', function () {
+        return view('front.thankyou');
+    })->name('front.thankyou');
 });
 
 Route::get('/', [FrontController::class, 'index'])->name('front.home');

@@ -19,4 +19,5 @@ class ShippingAddress extends Model
         'state',
         'zip',
     ];
+   
 }
