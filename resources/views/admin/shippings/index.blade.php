@@ -58,12 +58,24 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label>Country</label>
+
                                 <select id="ship_country" name="country_id" class="form-control">
-                                    <option value="" selected>Select A Country</option>
-                                    <option value="rest_of_world">Rest of World</option>
+
+                                    <option value="">Select A Country</option>
+
+                                    <option value="rest_of_world" {{ old('country_id')=='rest_of_world' ? 'selected'
+                                        : '' }}>
+                                        Rest of World
+                                    </option>
+
                                     @if(!empty($countries))
                                     @foreach($countries as $country)
-                                    <option value="{{ $country->id  }}">{{ $country->name }}</option>
+
+                                    <option value="{{ $country->id }}" {{ old('country_id')==$country->id ? 'selected' :
+                                        '' }}>
+                                        {{ $country->name }}
+                                    </option>
+
                                     @endforeach
                                     @endif
 
@@ -71,12 +83,13 @@
                             </div>
                         </div>
 
+
                         <!-- Charge -->
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label>Shipping Charge</label>
                                 <input type="number" name="shipping_charge" class="form-control"
-                                    placeholder="Enter charge">
+                                    placeholder="Enter charge" value="{{ old('shipping_charge') }}">
                             </div>
                         </div>
 
@@ -118,8 +131,10 @@
                             <td>{{ $shipping->country->name ?? 'Rest Of World' }}</td>
                             <td>{{ $shipping->shipping_charge }}</td>
                             <td class="text-center">
-                                <a class="btn btn-danger btn-sm" title="Delete" href="{{ route('shipping.destroy',$shipping->id) }}">
+                                <a class="btn btn-danger btn-sm" title="Delete"
+                                    href="{{ route('shipping.destroy',$shipping->id) }}">
                                     <i class="fas fa-trash"></i>
+                                    Delete
                                 </a>
                             </td>
                         </tr>

@@ -62,13 +62,66 @@ class AuthController extends Controller
         return redirect()->intended(route('front.home'));
     }
 
+
     public function profile()
     {
-
-        echo 'You are logged in';
+        $user = Auth::user();
+        return view('front.profile', compact('user'));
     }
 
-    
+
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
+
+        $validated = $request->validate([
+            'name'  => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'phone' => 'required',
+        ]);
+
+        /* Update profile */
+        $user->update([
+            'name'  => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+        ]);
+        return back()->with('success', 'Profile updated successfully');
+    }
+
+
+    public function changePassword()
+    {
+        return view('front.change-password');
+    }
+
+
+    public function updatePassword(Request $request)
+    {
+        $user = Auth::user();
+
+        $validated = $request->validate([
+            'current_password' => 'required',
+            'new_password'     => 'required|min:6|confirmed',
+        ]);
+        
+        if (!Hash::check($request->current_password, $user->password)) {
+
+            return back()
+                ->withErrors([
+                    'current_password' => 'Current password is incorrect'
+                ])
+                ->withInput();
+        }
+
+        $user->update([
+            'password' => Hash::make($request->new_password)
+        ]);
+
+        return back()->with('success', 'Password changed successfully');
+    }
+
+
     public function logout(Request $request)
     {
         Auth::logout();

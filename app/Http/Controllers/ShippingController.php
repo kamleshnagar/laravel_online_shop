@@ -17,7 +17,6 @@ class ShippingController extends Controller
     }
     public function store(Request $request)
     {
-        // dd($request->all());
         $validated = $request->validate([
             'country_id' => 'required',
             'shipping_charge' => 'required|numeric|min:0'
@@ -32,9 +31,10 @@ class ShippingController extends Controller
         $exists = Shipping::where('country_id', $request->country_id)->exists();
 
         if ($exists) {
-            return back()->with('error', 'Shipping already added for this country');
+            return back()
+                ->with('error', 'Shipping already added for this country.')
+                ->withInput();
         }
-        // dd($validated);
         Shipping::create($validated);
 
         return back()->with('success', 'Shipping Charges Created Successfully');

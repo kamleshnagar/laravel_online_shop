@@ -44,7 +44,7 @@
                                 Continue Shopping
                             </a>
 
-                            <a href="#" class="btn btn-outline-dark px-4">
+                            <a href="{{ route('front.orderSummery') }}" class="btn btn-outline-dark px-4">
                                 View Orders
                             </a>
 
