@@ -7,5 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Shipping extends Model
 {
-    use HasFactory;
+    protected $fillable = [
+        'country_id',
+        'shipping_charge'
+    ];
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class, 'country_id');
+    }
 }

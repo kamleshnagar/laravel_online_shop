@@ -229,6 +229,19 @@ class CartController extends Controller
         Cart::destroy();
 
         return redirect()->route('front.thankyou');
+    }
+
+    public function getShipping(Request $request)
+    {
         
+        $shipping = Shipping::where('country_id', $request->country_id)->first();
+
+        if (!$shipping) {
+            $shipping = Shipping::where('country_id', 'rest_of_world')->first();
+        }
+
+        return response()->json([
+            'shipping' => $shipping->shipping_charge ?? 0
+        ]);
     }
 }

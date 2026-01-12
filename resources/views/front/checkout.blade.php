@@ -46,7 +46,8 @@
                                                 <input @if ($loop->first)
                                                 checked
                                                 @endif name="saved_address" class="form-check-input" type="radio"
-                                                value="{{ $shippingAddress->id}}">
+                                                value="{{ $shippingAddress->id}}" id="saved_address" data-id="{{
+                                                $shippingAddress->country_id }}">
                                                 @php
 
                                                 @endphp
@@ -68,8 +69,8 @@
 
                                         <div class="form-check mt-2">
                                             <input name="saved_address" class="form-check-input" type="radio"
-                                                value="new" id="new_address" {{( old('saved_address')==='new' || empty($shippingAddress)) ? 'checked'
-                                                : '' }}>
+                                                value="new" id="new_address" {{( old('saved_address')==='new' ||
+                                                empty($shippingAddress)) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="new_address">
                                                 Use new address
                                             </label>
@@ -241,11 +242,13 @@
                                 </div>
                                 <div class="d-flex justify-content-between mt-2">
                                     <div class="h6"><strong>Shipping</strong></div>
-                                    <div class="h6"><strong>₹0</strong></div>
+                                    <div class="h6"><strong>₹ <span id="shippingAmount">0</span></strong></div>
                                 </div>
                                 <div class="d-flex justify-content-between mt-2 summery-end">
                                     <div class="h5"><strong>Total</strong></div>
-                                    <div class="h5"><strong>₹{{ Cart::subtotal() }}</strong></div>
+                                    <div class="h5">
+                                        <strong>₹<span id="totalAmount">{{ Cart::subtotal() }}</span></strong>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -321,27 +324,69 @@
 </main>
 
 @endsection
-
-
 @push('customJs')
 <script>
-    $('#payment_method_cod').click(function(){
+    $(document).ready(function(){
 
-            if ($(this).is(":checked") == true){
-                $('#cart_payment_form').addClass('d-none');
-            }
-        });
-        $('#payment_method_stripe').click(function(){
+$('#payment_method_cod').on('click',function(){
+    $('#cart_payment_form').addClass('d-none');
+});
 
-            if ($(this).is(":checked") == true){
-                $('#cart_payment_form').removeClass('d-none');
-            }
-        });
-        $('#new_address').click(function(){
+$('#payment_method_stripe').on('click',function(){
+    $('#cart_payment_form').removeClass('d-none');
+});
 
-            if ($(this).is(":checked") == true){
-                $('#address_area').removeClass('d-none');
-            }
-        });
+$('#new_address').on('click',function(){
+    $('#address_area').removeClass('d-none');
+});
+
+$('#saved_address').on('click',function(){
+    $('#address_area').addClass('d-none');
+});
+
+
+/* Subtotal (force number) */
+let subtotal = parseFloat("{{ Cart::subtotal(2,'.','') }}");
+
+/* Saved address change */
+$('input[name="saved_address"]').on('change',function(){
+
+    let countryId = $(this).data('id');
+    if(countryId){
+        getShipping(countryId);
+    }
+});
+
+/* New address country */
+$('#country').on('change',function(){
+    let countryId = $(this).val();
+    getShipping(countryId);
+});
+
+/* Fetch shipping */
+function getShipping(countryId){
+
+    $.ajax({
+        url : "{{ route('front.getShipping') }}",
+        type: "GET",
+        data:{ country_id: countryId },
+        success:function(res){
+
+            let shipping = parseFloat(res.shipping) || 0;
+            let total = subtotal + shipping;
+
+            $('#shippingAmount').text(shipping.toFixed(2));
+            $('#totalAmount').text(total.toFixed(2));
+        }
+    });
+}
+
+/* Load default */
+let defaultCountry = $('input[name="saved_address"]:checked').data('id');
+if(defaultCountry){
+    getShipping(defaultCountry);
+}
+
+});
 </script>
-@endpush()
+@endpush

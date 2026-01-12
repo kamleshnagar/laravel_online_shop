@@ -13,6 +13,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\FrontController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\ShippingController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -43,6 +44,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/thank-you', function () {
         return view('front.thankyou');
     })->name('front.thankyou');
+    Route::get('/get-shipping', [CartController::class, 'getShipping'])->name('front.getShipping');
 });
 
 Route::get('/', [FrontController::class, 'index'])->name('front.home');
@@ -102,6 +104,9 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('edit.product');
         Route::post('/products/{product}', [ProductController::class, 'update'])->name('update.product');
 
+        Route::get('/shippings', [ShippingController::class, 'index'])->name('shipping.index');
+        Route::post('/shippings', [ShippingController::class, 'store'])->name('shipping.store');
+        Route::get('/shipping/delete/{id}', [ShippingController::class, 'destroy'])->name('shipping.destroy');
 
         Route::get('/products-subcategories', [ProductSubCategoryController::class, 'index'])->name('index.product-subcategories');
 
