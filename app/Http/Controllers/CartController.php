@@ -179,7 +179,7 @@ class CartController extends Controller
         }
 
         $subtotal = Cart::subtotal(2, '.', '');
-        $shipping = Shipping::where('country_id',$shippingAddress->country_id)->first()->shipping_charge;
+        $shipping = Shipping::where('country_id', $shippingAddress->country_id)->first()->shipping_charge;
         $coupon_code = '';
         $discount = 0;
         $grand_total = $subtotal + $shipping;
@@ -228,12 +228,12 @@ class CartController extends Controller
 
         Cart::destroy();
 
-        return redirect()->route('front.thankyou');
+        return redirect()->route('front.thankyou',$order->id);
     }
 
     public function getShipping(Request $request)
     {
-        
+
         $shipping = Shipping::where('country_id', $request->country_id)->first();
 
         if (!$shipping) {
@@ -245,9 +245,10 @@ class CartController extends Controller
         ]);
     }
 
-    public function orderSummery(){
-        $user_id = Auth::id();
-        $orders = Order::where('user_id',$user_id)->paginate(10);
-        return view('front.orders',compact('orders'));
+   
+
+    public function thankyou($order_id)
+    {
+        return view('front.thankyou',compact('order_id'));
     }
 }

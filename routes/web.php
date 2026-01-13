@@ -12,6 +12,7 @@ use App\Http\Controllers\admin\TempImagesController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\FrontController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ShippingController;
 use App\Http\Controllers\ShopController;
@@ -37,20 +38,23 @@ Route::post('/login', [AuthController::class, 'loginProcess'])->name('account.lo
 
 
 Route::group(['middleware' => 'auth'], function () {
+    Route::get('/logout', [AuthController::class, 'logout'])->name('account.logout');
+
     Route::get('/profile', [AuthController::class, 'profile'])->name('account.profile');
     Route::post('/profile/update', [AuthController::class, 'updateProfile'])->name('account.profile.update');
     Route::get('/profile/change-password', [AuthController::class, 'changePassword'])->name('account.change.password');
     Route::post('/profile/update-password', [AuthController::class, 'updatePassword'])->name('account.password.update');
         
 
-    Route::get('/logout', [AuthController::class, 'logout'])->name('account.logout');
     Route::get('/checkout', [CartController::class, 'checkout'])->name('front.checkout');
     Route::post('/process-checkout', [CartController::class, 'processCheckout'])->name('front.processCheckout');
-    Route::get('/thank-you', function () {
-        return view('front.thankyou');
-    })->name('front.thankyou');
+    Route::get('/thank-you/{id}', [CartController::class, 'thankyou'])->name('front.thankyou');
     Route::get('/get-shipping', [CartController::class, 'getShipping'])->name('front.getShipping');
-    Route::get('/order-summery', [CartController::class, 'orderSummery'])->name('front.orderSummery');
+
+
+
+    Route::get('/orders', [OrderController::class, 'index'])->name('front.orders');
+    Route::get('/order-summery/{id}', [OrderController::class, 'orderSummery'])->name('front.orderSummery');
 });
 
 Route::get('/', [FrontController::class, 'index'])->name('front.home');
